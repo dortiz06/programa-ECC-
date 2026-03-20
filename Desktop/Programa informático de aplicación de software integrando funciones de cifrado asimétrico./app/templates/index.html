@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flipobook</title>
+  <style>
+    :root {
+      --fb-blue: #1877f2;
+      --fb-blue-dark: #166fe5;
+      --bg: #f0f2f5;
+      --card: #fff;
+      --text: #1c1e21;
+      --muted: #65676b;
+      --border: #dddfe2;
+      --ok: #42b72a;
+      --err: #f02849;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--fb-blue);
+      letter-spacing: -0.5px;
+    }
+    .tagline { font-size: 0.85rem; color: var(--muted); }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .wrap { grid-template-columns: 1fr; }
+    }
+    .hero h1 {
+      font-size: 2rem;
+      line-height: 1.2;
+      margin: 0 0 0.5rem 0;
+    }
+    .hero p { color: var(--muted); margin: 0; }
+    .card {
+      background: var(--card);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+    }
+    .card h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.15rem;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--fb-blue);
+      box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    }
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      background: var(--fb-blue);
+      color: #fff;
+      margin-top: 0.25rem;
+    }
+    .btn:hover { background: var(--fb-blue-dark); }
+    .btn-secondary {
+      background: #e4e6eb;
+      color: var(--text);
+      margin-top: 0.75rem;
+    }
+    .btn-secondary:hover { background: #d8dadf; }
+    .hint { font-size: 0.75rem; color: var(--muted); margin: -0.4rem 0 0.75rem 0; }
+    .flash {
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+    }
+    .flash.error {
+      background: #ffebe9;
+      border: 1px solid #f5c2c0;
+      color: #8a1f1f;
+    }
+    .flash.success {
+      background: #e7f3ff;
+      border: 1px solid #b8daff;
+      color: #0a4a7a;
+    }
+    .welcome {
+      background: linear-gradient(135deg, #e7f3ff 0%, #fff 100%);
+      border: 1px solid #b8daff;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .welcome strong { color: var(--fb-blue); font-size: 1.2rem; }
+    .ecc-box {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .ecc-box code {
+      display: block;
+      background: #f0f2f5;
+      padding: 0.5rem;
+      border-radius: 4px;
+      word-break: break-all;
+      font-size: 0.75rem;
+      margin-top: 0.35rem;
+    }
+    .feed-placeholder {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg);
+      border-radius: 8px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <span class="logo">Flipobook</span>
+      <span class="tagline"> — red social</span>
+    </div>
+    {% if registrado and nombre %}
+    <a href="{{ url_for('salir') }}" class="tagline" style="text-decoration:none;color:var(--fb-blue);font-weight:600;">Cerrar sesión</a>
+    {% endif %}
+  </header>
+
+  <div class="wrap">
+    <section class="hero">
+      <h1>Conecta con personas de forma privada</h1>
+      <p>
+        Flipobook es una simulación educativa: al registrarte se generan claves ECC
+        (SECP256R1) y se muestra cómo dos usuarios podrían acordar una clave compartida
+        con ECDH y proteger mensajes con la clave derivada (HKDF + AES-GCM).
+      </p>
+      {% if registrado and nombre %}
+      <div class="feed-placeholder">
+        Tu feed aparecería aquí. ¡Bienvenido a la comunidad, <strong>{{ nombre }}</strong>!
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% if registrado and nombre and ecc %}
+      <div class="welcome">
+        <p style="margin:0 0 0.5rem 0;">Hola, <strong>{{ nombre }}</strong></p>
+        <p style="margin:0;font-size:0.95rem;color:var(--text);">
+          {{ ecc.mensaje_exito }}
+        </p>
+        <div class="ecc-box">
+          <span>Comunicación segura con <strong>{{ ecc.otro_usuario }}</strong></span>
+          <br>
+          ECDH + HKDF: claves derivadas
+          {% if ecc.clave_derivada_coincide %}
+            <span style="color:var(--ok);font-weight:600;"> coinciden ✓</span>
+          {% else %}
+            <span style="color:var(--err);"> no coinciden</span>
+          {% endif %}
+          <br>
+          Mensaje de ejemplo cifrado (simulado, hex truncado):
+          <code>{{ ecc.mensaje_cifrado_hex_corto }}</code>
+          <span style="display:block;margin-top:0.35rem;">Texto original: «{{ ecc.mensaje_plano }}»</span>
+        </div>
+      </div>
+      {% else %}
+      <h2>Crear cuenta</h2>
+      <form method="post" action="{{ url_for('registro') }}" novalidate>
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" required
+               value="{{ old.get('nombre', '') }}" autocomplete="name">
+
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" name="correo" required
+               value="{{ old.get('correo', '') }}" autocomplete="email">
+
+        <label for="celular">Celular (10 dígitos)</label>
+        <input type="tel" id="celular" name="celular" required
+               value="{{ old.get('celular', '') }}" inputmode="numeric" autocomplete="tel">
+
+        <label for="contrasena">Contraseña</label>
+        <input type="password" id="contrasena" name="contrasena" required
+               autocomplete="new-password">
+        <p class="hint">Mín. 10 caracteres, mayúscula, número y carácter especial.</p>
+
+        <button type="submit" class="btn">Registrarse en Flipobook</button>
+      </form>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>
